@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Exchange Rates</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name_label_text">Валюта</string>
+    <string name="sold_label_text">Продажа</string>
+    <string name="buy_label_text">Покупка</string>
+    <string name="eur_name_text">EUR</string>
+    <string name="usd_name_text">USD</string>
+    <string name="rur_name_text">RUB</string>
+    <string name="pb_label_text">ПриватБанк</string>
+    <string name="nbu_text">НБУ</string>
+    <string name="app_name_text">Курсы валют</string>
+
+</resources>
