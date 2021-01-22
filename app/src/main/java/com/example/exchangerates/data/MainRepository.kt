@@ -1,25 +1,25 @@
 package com.example.exchangerates.data
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.example.exchangerates.R
 import com.example.exchangerates.data.model.Currency
-import com.example.exchangerates.data.model.ExchangeRate
-import com.google.gson.GsonBuilder
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+
+
+
 
 class MainRepository {
-    private var formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    private var formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.systemDefault())
     val data = MutableLiveData<Currency>()
 
-    fun getCurrencyFromAPI(date: LocalDate){
+    fun getCurrencyFromAPI(instant: Instant){
         var currency : Currency? = null
         val apiServices = RetrofitClient.pbApiServices
-        apiServices.getCurrency(date.format(formatter).toString()).enqueue(object : Callback<Currency> {
+        apiServices.getCurrency(formatter.format(instant)).enqueue(object : Callback<Currency> {
             override fun onResponse(call: Call<Currency>,response: Response<Currency>) {
                 currency = response.body()
                 data.postValue(currency)
@@ -32,3 +32,5 @@ class MainRepository {
     }
 
 }
+
+

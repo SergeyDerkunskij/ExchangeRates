@@ -10,17 +10,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.exchangerates.R
 import com.example.exchangerates.data.model.Currency
 import kotlinx.android.synthetic.main.fragment_main.*
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
+import org.threeten.bp.Instant
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
-    private var formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-    private val calendar = Calendar.getInstance()
-    private val year = calendar.get(Calendar.YEAR)
-    private val month = calendar.get(Calendar.MONTH)
-    private val day = calendar.get(Calendar.DAY_OF_MONTH)
+    private var formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.systemDefault())
 
     private lateinit var currency : Currency
     private lateinit var viewModel: MainViewModel
@@ -28,7 +26,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setDate(LocalDate.now())
+        setDate(Instant.now())
 
         pik_date_button_pb.setOnClickListener(pickDateClickListener)
         pik_date_button_nb.setOnClickListener(pickDateClickListener)
@@ -46,7 +44,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             currency = it
             fillInData(currency)
         })
-        viewModel.getCurrencyFromAPI(LocalDate.now())
+        viewModel.getCurrencyFromAPI(Instant.now())
     }
 
 
@@ -75,20 +73,27 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
     }
 
-    private fun setDate(date:LocalDate) {
+    private fun setDate(instant: Instant) {
         pb_date_text.paintFlags = pb_date_text.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         nb_date_text.paintFlags = nb_date_text.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-        pb_date_text.text = date.format(formatter).toString()
-        nb_date_text.text = date.format(formatter).toString()
+        pb_date_text.text = formatter.format(instant).toString()
+        nb_date_text.text = formatter.format(instant).toString()
     }
 
     private val pickDateClickListener: View.OnClickListener = View.OnClickListener {
+        val dateForRequest = LocalDateTime.now()
+
         val dpd = DatePickerDialog(requireContext(), DatePickerDialog.OnDateSetListener { _, mYear, mMonthOfYear, mDayOfMonth ->
             // Display Selected date in TextView
-            setDate(LocalDate.of(mYear,mMonthOfYear+1,mDayOfMonth))
+            val zonedDateTime = LocalDateTime.of(mYear, mMonthOfYear+1, mDayOfMonth,1,1)
+                .atZone(ZoneId.systemDefault()).toInstant()
 
-            viewModel.getCurrencyFromAPI(LocalDate.of(mYear,mMonthOfYear+1,mDayOfMonth))
-        }, year, month, day)
+            setDate(zonedDateTime)
+
+            viewModel.getCurrencyFromAPI(zonedDateTime)
+        }, dateForRequest.year,
+            dateForRequest.month.value-1,
+            dateForRequest.dayOfMonth)
         dpd.show()
     }
 

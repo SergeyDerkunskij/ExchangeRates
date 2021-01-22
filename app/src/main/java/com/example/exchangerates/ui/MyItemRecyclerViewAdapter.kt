@@ -130,6 +130,7 @@ class MyItemRecyclerViewAdapter(
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(override val containerView: View) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+
         fun bind(item: ExchangeRate, moneyNumber: Int){
             val rounded = String.format("%.2f", item.saleRateNB?.times(moneyNumber))
             sale_rate_nb.text = rounded + " " + item.baseCurrency
